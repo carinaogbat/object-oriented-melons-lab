@@ -1,24 +1,48 @@
 """Classes for melon orders."""
+import datetime
+# now = datetime.datetime.timestamp()
+# print(now)
+weekday = datetime.datetime.today().weekday()
+#monday is 0, sunday is 6
+print(weekday)
+now = datetime.datetime.now()
+current_time = now.time()
+time_in_string = current_time.strftime("%H")
 
+print(current_time)
+print(time_in_string)
 
-class DomesticMelonOrder:
-    """A melon order within the USA."""
-
+class AbstractMelonOrder():
+    order_type = None
+    tax = None 
     def __init__(self, species, qty):
-        """Initialize melon order attributes."""
-
+        
         self.species = species
         self.qty = qty
         self.shipped = False
-        self.order_type = "domestic"
-        self.tax = 0.08
-
+    
+    def get_base_price(self):
+        import datetime
+        weekday = datetime.datetime.today().weekday()
+        now = datetime.datetime.now()
+        current_time = now.time()
+        time_in_string = current_time.strftime("%H")
+        import random
+        base_price = range(5,10)
+        base_price = random.choice(base_price)
+        return base_price
+       
+    
     def get_total(self):
         """Calculate price, including tax."""
+        base_price = self.get_base_price()
+        if self.species == 'Christmas':
+            base_price = base_price * 1.5
 
-        base_price = 5
         total = (1 + self.tax) * self.qty * base_price
 
+        if self.order_type == 'international' and self.qty < 10:
+            total + 3
         return total
 
     def mark_shipped(self):
@@ -27,33 +51,33 @@ class DomesticMelonOrder:
         self.shipped = True
 
 
-class InternationalMelonOrder:
-    """An international (non-US) melon order."""
+class DomesticMelonOrder(AbstractMelonOrder):
+    """A melon order within the USA."""
+    order_type = "domestic"
+    tax = 0.08
+        
 
+class InternationalMelonOrder(AbstractMelonOrder):
+    """An international (non-US) melon order."""
+    order_type = "international"
+    tax = 0.17
     def __init__(self, species, qty, country_code):
         """Initialize melon order attributes."""
-
-        self.species = species
-        self.qty = qty
+        super().__init__(species, qty)
         self.country_code = country_code
-        self.shipped = False
-        self.order_type = "international"
-        self.tax = 0.17
-
-    def get_total(self):
-        """Calculate price, including tax."""
-
-        base_price = 5
-        total = (1 + self.tax) * self.qty * base_price
-
-        return total
-
-    def mark_shipped(self):
-        """Record the fact than an order has been shipped."""
-
-        self.shipped = True
+        
 
     def get_country_code(self):
         """Return the country code."""
 
         return self.country_code
+
+class GovernmentMelonOrder(AbstractMelonOrder):
+    tax = 0
+
+    passed_inspection = False
+
+
+    def mark_inspection(self):
+        self.passed_inspection = True
+    
