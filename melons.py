@@ -1,16 +1,17 @@
 """Classes for melon orders."""
 import datetime
+import random
 # now = datetime.datetime.timestamp()
 # print(now)
-weekday = datetime.datetime.today().weekday()
+# weekday = datetime.datetime.today().weekday()
 #monday is 0, sunday is 6
-print(weekday)
-now = datetime.datetime.now()
-current_time = now.time()
-time_in_string = current_time.strftime("%H")
+# print(weekday)
+# now = datetime.datetime.now()
+# current_time = now.time()
+# time_in_string = current_time.strftime("%H%M")
 
-print(current_time)
-print(time_in_string)
+# print(current_time)
+# print(time_in_string)
 
 class AbstractMelonOrder():
     order_type = None
@@ -22,14 +23,18 @@ class AbstractMelonOrder():
         self.shipped = False
     
     def get_base_price(self):
-        import datetime
-        weekday = datetime.datetime.today().weekday()
-        now = datetime.datetime.now()
-        current_time = now.time()
-        time_in_string = current_time.strftime("%H")
-        import random
         base_price = range(5,10)
         base_price = random.choice(base_price)
+
+        current_day_of_the_week = datetime.datetime.today().weekday()
+        is_weekday = current_day_of_the_week in range(0,5)
+        current_time = datetime.datetim.now.time()
+        hour_and_minutes = int(current_time.strftime("%H%M"))
+        is_rush_hour = hour_and_minutes in range(800,1200)
+
+        if is_weekday and is_rush_hour:
+            base_price +=4
+        
         return base_price
        
     
@@ -41,8 +46,7 @@ class AbstractMelonOrder():
 
         total = (1 + self.tax) * self.qty * base_price
 
-        if self.order_type == 'international' and self.qty < 10:
-            total + 3
+        
         return total
 
     def mark_shipped(self):
@@ -66,7 +70,12 @@ class InternationalMelonOrder(AbstractMelonOrder):
         super().__init__(species, qty)
         self.country_code = country_code
         
-
+    def get_total(self):
+        total = super().get_total
+        if self.qty < 10:
+            total += 3
+        return total 
+        
     def get_country_code(self):
         """Return the country code."""
 
@@ -74,8 +83,9 @@ class InternationalMelonOrder(AbstractMelonOrder):
 
 class GovernmentMelonOrder(AbstractMelonOrder):
     tax = 0
-
-    passed_inspection = False
+    def __init__(self,species, qty):
+        super().__init__(species, qty)
+        self.passed_inspection = False
 
 
     def mark_inspection(self):
