@@ -1,6 +1,7 @@
 """Classes for melon orders."""
 import datetime
 import random
+
 # now = datetime.datetime.timestamp()
 # print(now)
 # weekday = datetime.datetime.today().weekday()
@@ -17,11 +18,12 @@ class AbstractMelonOrder():
     order_type = None
     tax = None 
     def __init__(self, species, qty):
-        
+        if qty > 100:
+            raise TooManyMelonsError("No more than 100 melons.")
         self.species = species
         self.qty = qty
         self.shipped = False
-    
+
     def get_base_price(self):
         base_price = range(5,10)
         base_price = random.choice(base_price)
@@ -91,3 +93,6 @@ class GovernmentMelonOrder(AbstractMelonOrder):
     def mark_inspection(self):
         self.passed_inspection = True
     
+    
+class TooManyMelonsError(ValueError):
+      pass  
